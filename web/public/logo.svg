@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="MailGester">
+  <title>MailGester</title>
+  <g stroke="#1d2433" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- envelope -->
+    <rect x="12" y="54" width="104" height="64" rx="9" fill="#f6f3ec"/>
+    <path d="M16 112 L48 87 M112 112 L80 87" fill="none" opacity=".55"/>
+    <path d="M14 60 L64 96 L114 60" fill="none"/>
+
+    <!-- hat horns, drawn before the band so their bases are hidden -->
+    <path d="M36 48 C 36 34, 28 24, 12 22 C 30 26, 50 34, 56 48 Z" fill="#3b6fe0"/>
+    <path d="M36 48 C 36 34, 28 24, 12 22 C 30 26, 50 34, 56 48 Z" fill="#3b6fe0" transform="translate(128 0) scale(-1 1)"/>
+    <path d="M52 48 C 52 36, 58 24, 64 13 C 70 24, 76 36, 76 48 Z" fill="#e5533d"/>
+
+    <!-- hat band -->
+    <rect x="32" y="44" width="64" height="13" rx="6.5" fill="#f2b632"/>
+
+    <!-- bells -->
+    <circle cx="12" cy="22" r="5.5" fill="#f2b632"/>
+    <circle cx="116" cy="22" r="5.5" fill="#f2b632"/>
+    <circle cx="64" cy="10" r="5.5" fill="#f2b632"/>
+  </g>
+</svg>
