@@ -32,13 +32,18 @@ public static class DigestPrompt
         - A junk mail that looks genuine and could matter. When unsure about a possibly genuine personal or career related mail in junk, choose true.
         When to set notify to false:
         - Newsletters, promotions, receipts, automatic notifications, social media alerts, routine system mail, and ordinary spam or phishing.
+        - Parcel and delivery notices, order confirmations, and bank or service mail that needs nothing from the user.
+        - Notify is true only when at least one mail in noteworthy is the reason. Never notify because of phishing or spam.
 
         Fields:
-        - summary: 2 to 5 plain sentences in {{options.Language}}. Cover the volume, the main themes and what matters. Do not use ids and do not use markdown.
+        - summary: 2 to 4 plain sentences in {{options.Language}}. Cover the volume, the main themes and what matters. Do not use ids and do not use markdown.
         - notify: true or false, as described above.
         - urgency: high means it needs action today, low means worth reading when convenient, none means nothing needs attention. Use none when notify is false.
         - notifyReason: one short sentence in {{options.Language}} that is shown next to the ping. Empty when notify is false.
-        - noteworthy: at most 10 mails, most important first, empty if nothing stands out. For each one give id, category (recruiter, deadline, finance, security, personal or other), why (one short sentence in {{options.Language}}), action (reply, read, verify or none) and suspectedPhishing. Use verify when the sender should be checked before trusting the mail.
+        - noteworthy: the mails the user should actually look at, at most 5, most important first. An empty list is normal and good on a quiet day. Include only mail from real people or organisations that the user might need to read or answer, or that has a deadline. Never include phishing, spam, scams, promotions, newsletters, automatic notifications, or parcel and delivery notices. Do not list a mail just to say it is junk. For each one give id, category (recruiter, deadline, finance, security, personal or other), why (one short sentence in {{options.Language}}), action (reply, read or verify) and suspectedPhishing. Use verify only when a real looking mail needs its sender checked. Category personal means a real person wrote to the user, not an automatic message.
+
+        Junk volume:
+        Most junk is spam. Mention it in the summary in at most one short clause, for example that most of the junk was spam or phishing. Do not describe individual spam or phishing mails.
 
         Answer only with the JSON object that matches the required schema.
         """;

@@ -23,7 +23,7 @@ public sealed class DigestRecord
     public List<DigestItemRecord> Items { get; set; } = [];
 }
 
-/// <summary>Only noteworthy mails and keyword hits are kept, so history never holds the whole mailbox.</summary>
+/// <summary>Only noteworthy mails, keyword hits and mails hidden from Discord are kept, so history never holds the whole mailbox.</summary>
 public sealed class DigestItemRecord
 {
     public string Kind { get; set; } = "";

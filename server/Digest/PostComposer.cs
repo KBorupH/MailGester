@@ -8,8 +8,40 @@ namespace MailGester.Digest;
 /// </summary>
 public static class PostComposer
 {
-    private const int MaxNoteworthy = 10;
+    private const int MaxNoteworthy = 5;
     private const int MaxKeywordLines = 8;
+
+    /// <summary>Flagged mails worth showing, and flagged mails kept out of Discord but still stored in history.</summary>
+    public sealed record Selection(
+        IReadOnlyList<(NoteworthyItem Item, MailItem Mail)> Items,
+        IReadOnlyList<(NoteworthyItem Item, MailItem Mail)> Hidden);
+
+    /// <summary>
+    /// Applies the display rules in code, because a small model does not reliably leave obvious junk out of the list.
+    /// Suspected phishing and items that need no action and anything beyond the cap are moved to <see cref="Selection.Hidden"/>.
+    /// </summary>
+    public static Selection Select(DigestResult? ai, IReadOnlyList<MailItem> shown)
+    {
+        if (ai is null)
+        {
+            return new Selection([], []);
+        }
+
+        var valid = ai.Noteworthy
+            .Where(n => n.Id >= 1 && n.Id <= shown.Count)
+            .DistinctBy(n => n.Id)
+            .ToList();
+
+        var visible = valid
+            .Where(n => !n.SuspectedPhishing && !n.Action.Equals("none", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        var items = visible.Take(MaxNoteworthy).Select(n => (Item: n, Mail: shown[n.Id - 1])).ToList();
+        var shownIds = items.Select(i => i.Item.Id).ToHashSet();
+        var hidden = valid.Where(n => !shownIds.Contains(n.Id)).Select(n => (Item: n, Mail: shown[n.Id - 1])).ToList();
+
+        return new Selection(items, hidden);
+    }
 
     public static DigestPost Compose(
         DigestResult? ai,
@@ -23,8 +55,12 @@ public static class PostComposer
         string model)
     {
         var reasons = new List<string>();
+        var selection = Select(ai, shown);
+        var shownMails = selection.Items.Select(i => i.Mail).ToHashSet();
+        var extraHits = keywordHits.Where(m => !shownMails.Contains(m)).ToList();
 
-        if (ai is { Notify: true })
+        // A ping needs something to point at, so a model ping with nothing listed is ignored.
+        if (ai is { Notify: true } && (selection.Items.Count > 0 || keywordHits.Count > 0))
         {
             reasons.Add(ai.NotifyReason.Length > 0 ? ai.NotifyReason : "The digest has something worth a look.");
         }
@@ -45,19 +81,16 @@ public static class PostComposer
 
         var fields = new List<PostField>();
 
-        if (ai is not null)
+        foreach (var (item, mail) in selection.Items)
         {
-            foreach (var item in ai.Noteworthy.Where(n => n.Id >= 1 && n.Id <= shown.Count).DistinctBy(n => n.Id).Take(MaxNoteworthy))
-            {
-                fields.Add(NoteworthyField(item, shown[item.Id - 1]));
-            }
+            fields.Add(NoteworthyField(item, mail));
         }
 
-        if (keywordHits.Count > 0)
+        if (extraHits.Count > 0)
         {
-            var lines = keywordHits.Take(MaxKeywordLines).Select(m =>
+            var lines = extraHits.Take(MaxKeywordLines).Select(m =>
                 $"• {(m.IsJunk ? "**JUNK** " : "")}{Code(m.Subject, 80)} ({m.Account})");
-            var more = keywordHits.Count > MaxKeywordLines ? $"\n…and {keywordHits.Count - MaxKeywordLines} more" : "";
+            var more = extraHits.Count > MaxKeywordLines ? $"\n…and {extraHits.Count - MaxKeywordLines} more" : "";
             fields.Add(new PostField("Keyword matches", string.Join("\n", lines) + more));
         }
 
@@ -71,6 +104,7 @@ public static class PostComposer
         var junkCount = shown.Count(m => m.IsJunk);
         var footer = $"{shown.Count + omitted} mails from {mailboxCount} mailboxes, {junkCount} in junk"
             + (omitted > 0 ? $", {omitted} not analysed" : "")
+            + (selection.Hidden.Count > 0 ? $", {selection.Hidden.Count} hidden (see History)" : "")
             + $" · {model}";
 
         var description = aiFailure is not null
@@ -97,11 +131,6 @@ public static class PostComposer
             Neutralize(item.Why),
             $"Action: {item.Action}"
         };
-
-        if (item.SuspectedPhishing)
-        {
-            lines.Add("⚠ Possible phishing, do not click links.");
-        }
 
         return new PostField(name, string.Join("\n", lines));
     }

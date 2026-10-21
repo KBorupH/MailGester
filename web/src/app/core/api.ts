@@ -87,7 +87,7 @@ export interface FetchError {
 }
 
 export interface DigestItem {
-  kind: 'noteworthy' | 'keyword';
+  kind: 'noteworthy' | 'keyword' | 'hidden';
   account: string;
   folder: string;
   isJunk: boolean;

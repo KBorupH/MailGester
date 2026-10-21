@@ -57,6 +57,18 @@ import { Digest } from '../core/api';
       }
     }
 
+    @if (hidden().length) {
+      <h3 style="margin-top: 1rem">Hidden from Discord</h3>
+      <p class="muted">Flagged as likely phishing or needing no action. Check here if a mail seems to be missing.</p>
+      @for (i of hidden(); track $index) {
+        <div class="muted" style="padding: .15rem 0">
+          @if (i.isJunk) { <span class="badge junk">JUNK</span> }
+          @if (i.phishing) { <span class="badge hot">possible phishing</span> }
+          {{ i.subject }} · {{ i.sender }} · {{ i.account }}
+        </div>
+      }
+    }
+
     <p class="muted" style="margin-top: 1rem">
       {{ digest().mailCount }} mails from {{ digest().mailboxCount }} mailboxes, {{ digest().junkCount }} in junk.
       @if (digest().omitted) {
@@ -70,4 +82,5 @@ export class DigestView {
 
   protected readonly noteworthy = computed(() => this.digest().items.filter((i) => i.kind === 'noteworthy'));
   protected readonly keywords = computed(() => this.digest().items.filter((i) => i.kind === 'keyword'));
+  protected readonly hidden = computed(() => this.digest().items.filter((i) => i.kind === 'hidden'));
 }

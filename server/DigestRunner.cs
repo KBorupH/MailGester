@@ -172,16 +172,22 @@ public sealed class DigestRunner(
     {
         var items = new List<DigestItemRecord>();
 
-        if (result is not null)
+        var selection = PostComposer.Select(result, shown);
+        foreach (var (n, mail) in selection.Items)
         {
-            foreach (var n in result.Noteworthy.Where(n => n.Id >= 1 && n.Id <= shown.Count).DistinctBy(n => n.Id))
-            {
-                var mail = shown[n.Id - 1];
-                items.Add(ToItem("noteworthy", mail, n.Category, n.Why, n.Action, n.SuspectedPhishing));
-            }
+            items.Add(ToItem("noteworthy", mail, n.Category, n.Why, n.Action, n.SuspectedPhishing));
         }
 
-        items.AddRange(hits.Take(MaxKeywordItems).Select(m => ToItem("keyword", m, null, null, null, false)));
+        var listed = selection.Items.Select(i => i.Mail).ToHashSet();
+        var keywordMails = hits.ToHashSet();
+
+        // Hidden from Discord only. Keeping them here lets a wrongly flagged mail be found later.
+        foreach (var (n, mail) in selection.Hidden.Where(h => !keywordMails.Contains(h.Mail)))
+        {
+            items.Add(ToItem("hidden", mail, n.Category, n.Why, n.Action, n.SuspectedPhishing));
+        }
+
+        items.AddRange(hits.Where(m => !listed.Contains(m)).Take(MaxKeywordItems).Select(m => ToItem("keyword", m, null, null, null, false)));
 
         return new DigestRecord
         {
