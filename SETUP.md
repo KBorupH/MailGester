@@ -85,7 +85,7 @@ Leave the role ID empty if you never want a ping. The summary still posts.
 
 ### Choosing another model
 
-The model is a setting, so you can change it later and compare results with Run now on the Dashboard. Pick a model that returns structured JSON reliably and handles Danish if your mail is Danish. Check what fits your video memory. If the model plus context does not fit on the GPU, Ollama moves part of it to system memory and runs much slower. One digest a day can tolerate that, but you can also lower the Context size.
+The model is a setting, so you can change it later and compare results with Run now on the Dashboard. Pick a model that returns structured JSON reliably and handles the languages your mail is written in. Check what fits your video memory. If the model plus context does not fit on the GPU, Ollama moves part of it to system memory and runs much slower. One digest a day can tolerate that, but you can also lower the Context size.
 
 Models with a thinking mode may behave differently with structured output, so test them before relying on them.
 
@@ -180,9 +180,9 @@ The app registration is free according to a Microsoft moderator answer on Micros
 Settings, About you and what matters is passed to the model with every digest. Keep it short and concrete. Example:
 
 ```
-I am a fullstack .NET developer looking for work. My stack is C#, .NET, PostgreSQL and Angular. I need remote work.
+I am a software developer looking for a new job.
 
-Ping me when a mail is about a job and fits this profile. That means recruiters, headhunters, interview invitations, replies to my applications and job offers. Surface these even if they are in junk.
+Ping me when a mail is about a job opportunity that fits my background. That means recruiters, headhunters, interview invitations, replies to my applications and job offers. Surface these even if they are in junk.
 
 Do not ping for generic job board digests, newsletters or mass mailings that have no connection to my profile.
 ```
