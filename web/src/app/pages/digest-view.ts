@@ -34,8 +34,8 @@ import { Digest } from '../core/api';
       <h3 style="margin-top: 1rem">Noteworthy</h3>
       @for (i of noteworthy(); track $index) {
         <div style="padding: .5rem 0; border-top: 1px solid var(--line)">
-          <div class="row">
-            <strong>{{ i.subject }}</strong>
+          <div><strong>{{ i.subject }}</strong></div>
+          <div class="row" style="margin: .25rem 0">
             @if (i.category) { <span class="badge">{{ i.category }}</span> }
             @if (i.isJunk) { <span class="badge junk">JUNK</span> }
             @if (i.phishing) { <span class="badge hot">possible phishing</span> }
@@ -61,10 +61,13 @@ import { Digest } from '../core/api';
       <h3 style="margin-top: 1rem">Hidden from Discord</h3>
       <p class="muted">Flagged as likely phishing or needing no action. Check here if a mail seems to be missing.</p>
       @for (i of hidden(); track $index) {
-        <div class="muted" style="padding: .15rem 0">
-          @if (i.isJunk) { <span class="badge junk">JUNK</span> }
-          @if (i.phishing) { <span class="badge hot">possible phishing</span> }
-          {{ i.subject }} · {{ i.sender }} · {{ i.account }}
+        <div style="padding: .3rem 0">
+          <div class="muted">{{ i.subject }}</div>
+          <div class="row" style="margin: .2rem 0">
+            @if (i.isJunk) { <span class="badge junk">JUNK</span> }
+            @if (i.phishing) { <span class="badge hot">possible phishing</span> }
+            <span class="muted">{{ i.sender }} · {{ i.account }}</span>
+          </div>
         </div>
       }
     }
